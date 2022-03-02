@@ -1,0 +1,24 @@
+.cell {
+   background-color: #0099FF;
+   width: 100px;
+   height: 100px;
+   margin-left: 20px
+}
+
+.inner__circle {
+   width: 86px;
+   height: 86px;
+   border-radius: 50%;
+   background-color: white;
+   position: relative;
+   top: 7px;
+   left: 7px;
+}
+
+.red {
+  background-color: red;
+}
+
+.yellow {
+   background-color: yellow;
+}
