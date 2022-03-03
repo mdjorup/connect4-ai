@@ -1,7 +1,14 @@
 .app {
   background-color: #282828;
+  color:aliceblue;
+}
+.game {
+  margin-left: 50px;
+  padding-top: 20px
 }
 
-.board {
-   margin-left: 20px;
+.buttons {
+   display: flex;
+   width: 700px;
+   margin-bottom: 15px;
 }
