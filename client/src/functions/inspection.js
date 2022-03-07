@@ -1,4 +1,3 @@
-import { max } from "lodash";
 import { placePiece } from "./updates";
 
 const validMoves = (board) => {

@@ -5,7 +5,7 @@ import './Row.css'
 function Row({cells}) {
   return (
     <div className='row'>
-      {cells.map(cell => <Cell fill={cell}/> )}
+      {cells.map((cell, i) => <Cell key={i} fill={cell}/> )}
     </div>
   )
 }
