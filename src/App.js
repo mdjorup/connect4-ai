@@ -8,6 +8,8 @@ import { validMoves, evaluate, getOptimalMove, getWinner } from './functions/ins
 import {updateLines, placePiece} from './functions/updates';
 import {makeBoard, makeNewPaths} from './functions/initialization';
 
+import _ from 'lodash';
+
 function App() {
 
   const [board, setBoard] = useState(makeBoard())
@@ -30,8 +32,10 @@ function App() {
     if(winner){
       setGameOver(true);
     }
-    const optimal = getOptimalMove(state.board, state.redPaths, state.yellowPaths)
-    const newState = placePiece(state.board, state.redPaths, state.yellowPaths, "y", optimal)
+    const optimal = getOptimalMove(_.cloneDeep(state.board), _.cloneDeep(state.redPaths), _.cloneDeep(state.yellowPaths), 1, -100000, 100000, true)
+    console.log("Got here")
+    const newState = placePiece(_.cloneDeep(state.board), _.cloneDeep(state.redPaths), _.cloneDeep(state.yellowPaths), "y", optimal)
+    console.log("Got Here 2")
     setBoard(newState.board)
     setRedPaths(newState.redPaths)
     setYellowPaths(newState.yellowPaths)

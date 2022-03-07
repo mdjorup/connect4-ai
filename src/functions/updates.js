@@ -1,10 +1,11 @@
 const _ = require('lodash');
 
 
-const updateLines = (board, lines, color, r, c) =>{
+const updateLines = (board, colorlines, color, r, c) =>{
   //lines is the 2d array of available moves
+  const lines = _.cloneDeep(colorlines)
   lines[r][c] = 0
-  // (1, -1)
+  //(1, -1)
   const dirs = [[1, 1], [1, 0], [1, -1], [0, -1]];
   dirs.forEach(element => {
    for(let i = 1; i <= 3; i++) {
@@ -16,6 +17,7 @@ const updateLines = (board, lines, color, r, c) =>{
        break;
      }
      //need to keep 0 if already 0
+
      if(lines[cur_r][cur_c] === 0){
        continue;
      }
@@ -39,17 +41,18 @@ const updateLines = (board, lines, color, r, c) =>{
        continue;
      }
      
-     lines[cur_r][cur_c] -= 1;
+     lines[cur_r][cur_c] -= 1 
      
    }
   })
+  return lines;
 }
 
 const placePiece = (board, redPaths, yellowPaths, color, column) => {
 
  const nextBoard = _.cloneDeep(board)
- const nextRedPaths = _.cloneDeep(redPaths)
- const nextYellowPaths = _.cloneDeep(yellowPaths)
+ let nextRedPaths = _.cloneDeep(redPaths)
+ let nextYellowPaths = _.cloneDeep(yellowPaths)
  
  //this can be removed once we only get the valid moves
  if(nextBoard[0][column]){
@@ -64,8 +67,14 @@ const placePiece = (board, redPaths, yellowPaths, color, column) => {
    while(r >=0 && nextBoard[r][column] !== ""){
      r--;
    }
-   color === 'y' ? updateLines(nextBoard, nextRedPaths, "y", r, column) : updateLines(nextBoard, nextYellowPaths, "r", r, column);
    
+   if(color === 'y'){
+     nextRedPaths = updateLines(nextBoard, nextRedPaths, "y", r, column)
+   } else{
+     nextYellowPaths = updateLines(nextBoard, nextYellowPaths, "r", r, column)
+   }
+
+
    nextBoard[r][column] = color
  }
  return {
