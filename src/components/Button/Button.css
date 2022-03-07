@@ -3,3 +3,12 @@
    display: flex;
    justify-content: center;
 }
+
+.button {
+    background-color: lightblue;
+    border: none;
+    color: black;
+    padding: 5px 10px 5px 10px;
+    border-radius: 4px;
+    cursor: pointer
+}

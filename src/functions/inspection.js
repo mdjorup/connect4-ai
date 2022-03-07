@@ -23,8 +23,14 @@ const evaluate = (redPaths, yellowPaths) => {
   return sumYellowPaths - sumRedPaths;
 }
 
-const getWinner = (board) => {
-   
+const getWinner = (board, color) => {
+   //true if there is a winner, false if not. Only check if the color is a winner
+   return false;
 }
 
-export {validMoves, evaluate};
+const getOptimalMove = (board, redPaths, yellowPaths) => {
+  //Returns a column that is the optimal move
+  return 4;
+}
+
+export {validMoves, evaluate, getWinner, getOptimalMove};
