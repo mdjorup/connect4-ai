@@ -17,19 +17,19 @@ def valid_moves(board):
 def getWinner(board, color):
   for i in range(7):
     for j in range(4):
-      if board[i][j] == color or board[i][j+1] == color or board[i][j+2] == color or board[i][j+3] == color:
+      if board[i][j] == color and board[i][j+1] == color and board[i][j+2] == color and board[i][j+3] == color:
         return True
   for i in range(4):
      for j in range(7):
-       if board[i][j] == color or board[i+1][j] == color or board[i+2][j] == color or board[i+3][j] == color:
+       if board[i][j] == color and board[i+1][j] == color and board[i+2][j] == color and board[i+3][j] == color:
          return True
   for i in range(4):
      for j in range(4):
-       if board[i][j] == color or board[i+1][j+1] == color or board[i+2][j+2] == color or board[i+3][j+3] == color:
+       if board[i][j] == color and board[i+1][j+1] == color and board[i+2][j+2] == color and board[i+3][j+3] == color:
          return True
   for i in range(4):
      for j in range(3, 7):
-       if board[i][j] == color or board[i+1][j-1] == color or board[i+2][j-2] == color or board[i+3][j-3] == color:
+       if board[i][j] == color and board[i+1][j-1] == color and board[i+2][j-2] == color and board[i+3][j-3] == color:
          return True
   return False
 
@@ -37,9 +37,9 @@ def evaluate(board, redPaths, yellowPaths, color):
   sumRedPaths = 0
   sumYellowPaths = 0
 
-  if getWinner(board, color) and color == 'y':
+  if color == 'y' and getWinner(board, color):
     return 100000
-  elif getWinner(board, color) and color == 'r':
+  elif color == 'r' and getWinner(board, color):
     return -100000
 
   for r in range(7):
@@ -47,7 +47,7 @@ def evaluate(board, redPaths, yellowPaths, color):
       sumRedPaths += redPaths[r][c]
       sumYellowPaths += yellowPaths[r][c]
 
-  return sumYellowPaths - sumYellowPaths
+  return sumYellowPaths - sumRedPaths
 
 def update_paths(board, colorPaths, color, r, c):
   lines = copy.deepcopy(colorPaths)
@@ -103,16 +103,80 @@ def place_piece(board, redPaths, yellowPaths, color, column):
 
   return next_board, next_red, next_yellow
 
-def get_optimal_move(board, redPaths, yellowPaths, depth, alpha, beta, aiTurn):
-  return
+def alpha_beta(board, redPaths, yellowPaths, depth, alpha, beta, aiTurn):
+
+  moves = valid_moves(board)
+  if depth == 0 or len(moves) == 0:
+    color = 'y' if aiTurn else 'r'
+    return evaluate(board, redPaths, yellowPaths, color)
+  
+  if aiTurn:
+    value = -100000000
+    for move in moves:
+      
+      nboard, nred, nyellow = place_piece(board, redPaths, yellowPaths, 'y', move)
+      value = max(value, alpha_beta(nboard, nred, nyellow, depth-1, alpha, beta, False))
+      if value >= beta:
+        break
+      alpha = max(alpha, value)
+    return value
+  else:
+    value = 100000000
+    for move in moves:
+      nboard, nred, nyellow = place_piece(board, redPaths, yellowPaths, 'r', move)
+      value = min(value, alpha_beta(nboard, nred, nyellow, depth-1, alpha, beta, True))
+      if value <= alpha:
+        break
+      beta = min(beta, value)
+    return value
+
+def get_optimal_move(board, redPaths, yellowPaths):
+  moves = valid_moves(board)
+  max_value = -10000000
+  best_move = -1
+  for move in moves:
+    nboard, nred, nyellow = place_piece(board, redPaths, yellowPaths, 'y', move)
+    value = alpha_beta(nboard, nred, nyellow, 4, -100000, 100000, False)
+    if value > max_value:
+      max_value = value
+      best_move = move
+  return best_move
 
   
 
 @app.route('/move/', methods=['GET', 'POST'])
-def hello(): 
+def move(): 
   data = json.loads(request.data)
-  print(data.get('board', "no board"))
-  return "Hello"
+  color = data.get('color')
+  board = data.get('board')
+  redPaths = data.get('redPaths')
+  yellowPaths = data.get('yellowPaths')
+  column = data.get('column', "")
+
+  if color == 'r':
+    nboard, nred, nyellow = place_piece(board, redPaths, yellowPaths, color, column)
+    evaluation = evaluate(nboard, nred, nyellow, color)
+    winner = getWinner(nboard, color)
+    return jsonify({
+      'board': nboard,
+      'redPaths': nred,
+      'yellowPaths': nyellow,
+      'evaluation': evaluation,
+      'winner': winner,
+    })
+  elif color == 'y':
+    optimal_move = get_optimal_move(board, redPaths, yellowPaths)
+    nboard, nred, nyellow = place_piece(board, redPaths, yellowPaths, color, optimal_move)
+    evaluation = evaluate(nboard, nred, nyellow, color)
+    winner = getWinner(nboard, color)
+    return jsonify({
+      'board': nboard,
+      'redPaths': nred,
+      'yellowPaths': nyellow,
+      'evaluation': evaluation,
+      'winner': winner,
+    })
+
 
 
 if __name__ == '__main__':
